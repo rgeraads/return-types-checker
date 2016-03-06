@@ -1,0 +1,18 @@
+---
+- name: Return Types Checker Provisioning
+  hosts: all
+  become: yes
+
+  tasks:
+  - name: add php7.0 repository
+    apt_repository: repo='ppa:ondrej/php'
+
+  - name: update packages
+    apt: update_cache=yes
+
+  - name: install packages
+    apt: name={{ item }} state=latest
+    with_items:
+      - vim
+      - php7.0
+      - php-xdebug

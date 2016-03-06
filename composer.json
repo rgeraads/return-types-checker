@@ -1,0 +1,16 @@
+{
+    "name": "randy/return-types-checker",
+    "description": "Tool to check if functions/methods have return types",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Randy Geraads",
+            "email": "r.geraads@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "": "src"
+        }
+    }
+}
