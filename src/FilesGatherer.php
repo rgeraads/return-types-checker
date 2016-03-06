@@ -12,7 +12,7 @@ final class FilesGatherer
         $it = new \RecursiveIteratorIterator($it);
         $it = new \RegexIterator($it, '/\.php$/i');
 
-        /** @var SplFileInfo[] $it */
+        /** @var \SplFileInfo[] $it */
         foreach ($it as $fi) {
             $pathName = $fi->getPathname();
             if ($pathName === false) {

@@ -3,14 +3,18 @@
 namespace ReturnTypesChecker;
 
 use ReturnTypesChecker\Tokenizer\TokenizedClass;
+use ReturnTypesChecker\Tokenizer\TokenizedFunction;
 
 final class Tokenizer
 {
-    private $tokenizedFile;
+    private $classes   = [];
+    private $methods   = [];
+    private $functions = [];
 
     private function __construct(array $tokenizedFile)
     {
-        $this->tokenizedFile = $tokenizedFile;
+        $this->retrieveClassesFromFile($tokenizedFile);
+        $this->retrieveFunctionsFromFile($tokenizedFile);
     }
 
     public static function tokenize(string $filePath): self
@@ -25,40 +29,36 @@ final class Tokenizer
         return token_get_all(file_get_contents($filePath));
     }
 
-    public function retrieveClasses()
+    private function retrieveClassesFromFile(array $tokenizedFile)
     {
-        $class = TokenizedClass::generate($this->tokenizedFile);
-var_dump($class);
-        $reflectionClass = new \ReflectionClass($class->getName());
-        $tokenizedClass  = TokenizedClass::generate($reflectionClass);
-    }
-
-    private function getClassesFromFile(array $tokens): array
-    {
-        $classes = [];
-
-        for ($i = 0; $i < count($tokens); $i++) {
-            if ($tokens[$i][0] === T_CLASS) {
-                $classes[] = $tokens[$i + 2][1];
+        for ($i = 0; $i < count($tokenizedFile); $i++) {
+            if ($tokenizedFile[$i][0] === T_CLASS) {
+                $this->classes[] = TokenizedClass::generate($tokenizedFile[$i + 2]);
             }
         }
-
-        return $classes;
     }
 
-    private function getFunctionsFromFile(array $tokens): array
+    private function retrieveFunctionsFromFile(array $tokenizedFile)
     {
-        $methods = [];
-
-        for ($i = 0; $i < count($tokens); $i++) {
-            if ($tokens[$i][0] === T_FUNCTION) {
-                $methods[] = $tokens[$i + 2][1];
-            }
-            if ($tokens[$i][0] === T_CALLABLE) {
-                var_dump($tokens[$i][0]);
+        for ($i = 0; $i < count($tokenizedFile); $i++) {
+            if ($tokenizedFile[$i][0] === T_FUNCTION) {
+                $this->functions[] = TokenizedFunction::generate($tokenizedFile[$i + 2]);
             }
         }
+    }
 
-        return $methods;
+    public function getClasses(): array
+    {
+        return $this->classes;
+    }
+
+    public function getMethods(): array
+    {
+        return $this->methods;
+    }
+
+    public function getFunctions(): array
+    {
+        return $this->functions;
     }
 }

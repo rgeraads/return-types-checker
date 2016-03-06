@@ -2,25 +2,27 @@
 
 namespace ReturnTypesChecker\Reflector;
 
-final class ParsedFunction
+final class ReflectedMethod
 {
+    const EXCLUDED_METHODS = ['__construct', '__destruct', '__clone'];
+
     /**
-     * @var string The name of the function.
+     * @var string The name of the method.
      */
     private $name;
 
     /**
-     * @var int Line number that indicates the beginning of the function.
+     * @var int Line number that indicates the beginning of the method.
      */
     private $startLine;
 
     /**
-     * @var int Line number that indicates the end of the function.
+     * @var int Line number that indicates the end of the method.
      */
     private $endLine;
 
     /**
-     * @var array Actual function contents parsed as an array.
+     * @var array Actual method contents parsed as an array.
      */
     private $contents;
 
@@ -32,12 +34,12 @@ final class ParsedFunction
         $this->contents  = $contents;
     }
 
-    public static function generate(\ReflectionFunction $reflectionFunction): self
+    public static function generate(\ReflectionMethod $reflectionMethod): self
     {
-        $contents = explode(PHP_EOL, file_get_contents($reflectionFunction->getFileName()));
+        $contents = explode(PHP_EOL, file_get_contents($reflectionMethod->getFileName()));
 
         foreach ($contents as $key => $row) {
-            if ($key < $reflectionFunction->getStartLine() - 1 || $key > $reflectionFunction->getEndLine() - 1) {
+            if ($key < $reflectionMethod->getStartLine() - 1 || $key > $reflectionMethod->getEndLine() - 1) {
                 unset($contents[$key]);
 
                 continue;
@@ -45,9 +47,9 @@ final class ParsedFunction
         }
 
         return new self(
-            $reflectionFunction->getName(),
-            $reflectionFunction->getStartLine(),
-            $reflectionFunction->getEndLine(),
+            $reflectionMethod->getName(),
+            $reflectionMethod->getStartLine(),
+            $reflectionMethod->getEndLine(),
             $contents
         );
     }

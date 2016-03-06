@@ -6,10 +6,8 @@ class Foo
 {
     public function bar()
     {
-        $a = function () {};
         return 'bla1';
     }
-
 }
 
 function baz() {

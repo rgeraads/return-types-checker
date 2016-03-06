@@ -2,7 +2,7 @@
 
 namespace ReturnTypesChecker\Reflector;
 
-final class ParsedClass
+final class ReflectedClass
 {
     /**
      * @var string The name of the class.

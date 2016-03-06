@@ -2,55 +2,74 @@
 
 namespace ReturnTypesChecker;
 
-use ReturnTypesChecker\Reflector\ParsedClass;
-use ReturnTypesChecker\Reflector\ParsedFunction;
-use ReturnTypesChecker\Reflector\ParsedMethod;
-use ReturnTypesChecker\Tokenizer\TokenizedClass;
+use ReturnTypesChecker\Reflector\ReflectedClass;
+use ReturnTypesChecker\Reflector\ReflectedFunction;
+use ReturnTypesChecker\Reflector\ReflectedMethod;
 
 final class Reflector
 {
     /**
-     * @var int Line number that indicates the beginning of the class.
+     * @var ReflectedClass[]
      */
-    private $classStartLine;
+    private $classes;
 
     /**
-     * @var int Line number that indicates the end of the class.
+     * @var ReflectedMethod[]
      */
-    private $classEndLine;
+    private $methods;
+
+    /**
+     * @var ReflectedFunction[]
+     */
+    private $functions;
+
+    private function __construct(array $classes, array $methods, array $functions)
+    {
+        $this->classes   = $classes;
+        $this->methods   = $methods;
+        $this->functions = $functions;
+    }
 
     public static function reflect(string $filePath)
     {
-        $tokens = Tokenizer::tokenize($filePath);
-        $class = $tokens->retrieveClasses();
-        self::parseClass();
+        $tokenizedFile = Tokenizer::tokenize($filePath);
+
+        // todo: loop over file and generate reflected classes, methods & functions.
+
+        $classes   = [];
+        $methods   = [];
+        $functions = [];
+
+        return new self($classes, $methods, $functions);
     }
 
-    public function checkIfMethodHasReturType(\ReflectionMethod $method)
+    private static function reflectClass(\ReflectionClass $class): ReflectedClass
     {
-        $returnValue = $this->getReturnValue($this->parseMethod($method));
-
-        $reflectionMethod = new \ReflectionMethod($method->getDeclaringClass()->getName(), $method->getName());
-
-        if ($returnValue !== self::NO_RETURN_VALUE && $reflectionMethod->getReturnType() === null) {
-            echo sprintf(
-                    'Method "%s" returns %s but has no return type set.', $method->getName(), $returnValue
-                ) . PHP_EOL;
-        }
+        return ReflectedClass::generate($class);
     }
 
-    private static function parseClass(\ReflectionClass $method): ParsedClass
+    private static function reflectMethod(\ReflectionMethod $method): ReflectedMethod
     {
-        return ParsedClass::generate($method);
+        return ReflectedMethod::generate($method);
     }
 
-    private static function parseMethod(\ReflectionMethod $method): ParsedMethod
+    private static function reflectFunction(\ReflectionFunction $function): ReflectedFunction
     {
-        return ParsedMethod::generate($method);
+        return ReflectedFunction::generate($function);
     }
 
-    private static function parseFunction(\ReflectionFunction $function): ParsedFunction
+    public function getClasses(): array
     {
-        return ParsedFunction::generate($function);
+        return $this->classes;
+    }
+
+    public function getMethods(): array
+    {
+        return $this->methods;
+    }
+
+    public function getFunctions(): array
+    {
+        return $this->functions;
     }
 }

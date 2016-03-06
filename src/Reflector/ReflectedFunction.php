@@ -2,27 +2,25 @@
 
 namespace ReturnTypesChecker\Reflector;
 
-final class ParsedMethod
+final class ReflectedFunction
 {
-    const EXCLUDED_METHODS = ['__construct', '__destruct', '__clone'];
-
     /**
-     * @var string The name of the method.
+     * @var string The name of the function.
      */
     private $name;
 
     /**
-     * @var int Line number that indicates the beginning of the method.
+     * @var int Line number that indicates the beginning of the function.
      */
     private $startLine;
 
     /**
-     * @var int Line number that indicates the end of the method.
+     * @var int Line number that indicates the end of the function.
      */
     private $endLine;
 
     /**
-     * @var array Actual method contents parsed as an array.
+     * @var array Actual function contents parsed as an array.
      */
     private $contents;
 
@@ -34,12 +32,12 @@ final class ParsedMethod
         $this->contents  = $contents;
     }
 
-    public static function generate(\ReflectionMethod $reflectionMethod): self
+    public static function generate(\ReflectionFunction $reflectionFunction): self
     {
-        $contents = explode(PHP_EOL, file_get_contents($reflectionMethod->getFileName()));
+        $contents = explode(PHP_EOL, file_get_contents($reflectionFunction->getFileName()));
 
         foreach ($contents as $key => $row) {
-            if ($key < $reflectionMethod->getStartLine() - 1 || $key > $reflectionMethod->getEndLine() - 1) {
+            if ($key < $reflectionFunction->getStartLine() - 1 || $key > $reflectionFunction->getEndLine() - 1) {
                 unset($contents[$key]);
 
                 continue;
@@ -47,9 +45,9 @@ final class ParsedMethod
         }
 
         return new self(
-            $reflectionMethod->getName(),
-            $reflectionMethod->getStartLine(),
-            $reflectionMethod->getEndLine(),
+            $reflectionFunction->getName(),
+            $reflectionFunction->getStartLine(),
+            $reflectionFunction->getEndLine(),
             $contents
         );
     }

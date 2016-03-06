@@ -2,15 +2,15 @@
 
 namespace ReturnTypesChecker\Tokenizer;
 
-final class TokenizedClass
+final class TokenizedFunction
 {
     /**
-     * @var string The name of the class.
+     * @var string The name of the function.
      */
     private $name;
 
     /**
-     * @var int Line number that indicates the beginning of the class.
+     * @var int Line number that indicates the beginning of the function.
      */
     private $startLine;
 
