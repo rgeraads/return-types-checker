@@ -5,9 +5,13 @@ namespace ReturnTypesChecker;
 use ReturnTypesChecker\Reflector\ReflectedClass;
 use ReturnTypesChecker\Reflector\ReflectedFunction;
 use ReturnTypesChecker\Reflector\ReflectedMethod;
+use ReturnTypesChecker\Tokenizer\TokenizedClass;
+use ReturnTypesChecker\Tokenizer\TokenizedFunction;
 
 final class Reflector
 {
+    private $filePath;
+
     /**
      * @var ReflectedClass[]
      */
@@ -17,14 +21,14 @@ final class Reflector
      * @var ReflectedMethod[]
      */
     private $methods;
-
     /**
      * @var ReflectedFunction[]
      */
     private $functions;
 
-    private function __construct(array $classes, array $methods, array $functions)
+    private function __construct(string $filePath, array $classes, array $methods, array $functions)
     {
+        $this->filePath  = $filePath;
         $this->classes   = $classes;
         $this->methods   = $methods;
         $this->functions = $functions;
@@ -34,28 +38,43 @@ final class Reflector
     {
         $tokenizedFile = Tokenizer::tokenize($filePath);
 
-        // todo: loop over file and generate reflected classes, methods & functions.
-
         $classes   = [];
         $methods   = [];
         $functions = [];
 
-        return new self($classes, $methods, $functions);
+        foreach ($tokenizedFile->getClasses() as $class) {
+            $classes[] = self::reflectClass($class);
+
+            foreach ($tokenizedFile->getMethods() as $method) {
+                $methods[] = self::reflectMethod($class, $method->getName());
+            }
+        }
+
+        foreach ($tokenizedFile->getFunctions() as $function) {
+//            $functions[] = self::reflectFunction($function);
+        }
+
+        return new self($filePath, $classes, $methods, $functions);
     }
 
-    private static function reflectClass(\ReflectionClass $class): ReflectedClass
+    private static function reflectClass(TokenizedClass $class): ReflectedClass
     {
-        return ReflectedClass::generate($class);
+        return ReflectedClass::generate(new \ReflectionClass($class->getFullyQualifiedName()));
     }
 
-    private static function reflectMethod(\ReflectionMethod $method): ReflectedMethod
+    private static function reflectMethod(TokenizedClass $class, string $methodName): ReflectedMethod
     {
-        return ReflectedMethod::generate($method);
+        return ReflectedMethod::generate(new \ReflectionMethod($class->getFullyQualifiedName(), $methodName));
     }
 
-    private static function reflectFunction(\ReflectionFunction $function): ReflectedFunction
+    private static function reflectFunction(TokenizedFunction $function): ReflectedFunction
     {
-        return ReflectedFunction::generate($function);
+        return ReflectedFunction::generate(new \ReflectionFunction($function->getName()));
+    }
+
+    public function getFilePath(): string
+    {
+        return $this->filePath;
     }
 
     public function getClasses(): array

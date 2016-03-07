@@ -14,18 +14,24 @@ final class TokenizedClass
      */
     private $startLine;
 
-    private function __construct(string $name, string $startLine)
+    /**
+     * @var string Possible namespace of the class.
+     */
+    private $namespace;
+
+    private function __construct(string $name, int $startLine, string $namespace)
     {
         $this->name      = $name;
         $this->startLine = $startLine;
+        $this->namespace = $namespace;
     }
 
-    public static function generate(array $tokens): self
+    public static function generate(array $token, string $namespace = ''): self
     {
-        $name      = $tokens[1];
-        $startLine = (int) $tokens[2];
+        $name      = $token[1];
+        $startLine = (int) $token[2];
 
-        return new self($name, $startLine);
+        return new self($name, $startLine, $namespace);
     }
 
     public function getName(): string
@@ -36,5 +42,21 @@ final class TokenizedClass
     public function getStartLine(): int
     {
         return $this->startLine;
+    }
+
+    public function getNamespace(): string
+    {
+        return $this->namespace;
+    }
+
+    public function getFullyQualifiedName(): string
+    {
+        $fullyQualifiedName = '';
+
+        if ($this->namespace !== '') {
+            $fullyQualifiedName = $this->namespace . '\\';
+        }
+
+        return $fullyQualifiedName . $this->name;
     }
 }

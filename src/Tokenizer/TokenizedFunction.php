@@ -14,16 +14,16 @@ final class TokenizedFunction
      */
     private $startLine;
 
-    private function __construct(string $name, string $startLine)
+    private function __construct(string $name, int $startLine)
     {
         $this->name      = $name;
         $this->startLine = $startLine;
     }
 
-    public static function generate(array $tokens): self
+    public static function generate(array $token): self
     {
-        $name      = $tokens[1];
-        $startLine = (int) $tokens[2];
+        $name      = $token[1];
+        $startLine = (int) $token[2];
 
         return new self($name, $startLine);
     }

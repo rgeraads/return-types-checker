@@ -10,6 +10,6 @@ class Foo
     }
 }
 
-function baz() {
-    return 'bla2';
-};
+//function baz() {
+//    return 'bla2';
+//};
